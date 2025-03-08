@@ -1,0 +1,22 @@
+1. Initialize program
+    / declare file pointer 
+
+    / display Menu options and receive choice at variable 'choice'
+        1. View History 
+        2. Retrieve transaction 
+        3. Export Transaction
+
+2. Decision: View History
+    
+    / if choice = 1
+        / set file pointer to TransLog.txt in read format
+
+        / display '+----------+--------------------+------------+--------------------+'
+        / display '| date(10) | name(20)           | amount(12) | invoice no(20)     |'
+        / display '+----------+--------------------+------------+--------------------+'
+
+    2.1. Display Formatted Text
+
+        / until EOF, do
+            / display 'value in file pointer' (increment pointer)
+            / 
