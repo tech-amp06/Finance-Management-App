@@ -1,9 +1,10 @@
 1. Initialize program
+    / clear screen
     / declare file pointer 
 
     / display Menu options and receive choice at variable 'choice'
         1. View History 
-        2. Retrieve transaction 
+        2. Retrieve Transaction 
         3. Export Transaction
 
 2. Decision: View History
@@ -18,5 +19,28 @@
     2.1. Display Formatted Text
 
         / until EOF, do
-            / display 'value in file pointer' (increment pointer)
-            / 
+            / display ch with proper spacing (ch = value at file pointer)
+        
+        / display '+----------+--------------------+------------+--------------------+'
+
+3. Decision: Retrieve Transaction 
+
+    / declare and read key
+    / declare file pointer and open file at pointer in read mode
+
+    / display '+----------+--------------------+------------+--------------------+'
+    / display '| date(10) | name(20)           | amount(12) | invoice no(20)     |'
+    / display '+----------+--------------------+------------+--------------------+'
+    
+    / until EOF, do
+        / if key = word_of_pointer
+            / display ch with proper spacing (ch = value at file pointer)
+        
+        / else
+            / display NA 
+        
+        / display '+----------+--------------------+------------+--------------------+'
+
+4. Decision: Export Transaction
+    
+    
