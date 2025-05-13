@@ -1,15 +1,27 @@
 #include <stdio.h>
 
 int getMax(int values[], int length) {
-    int maxExpense = values[0];
+    int monthOfMaxExpense = 0;
 
     for (int i = 1; i < length; i++) {
-        if (maxExpense < values[i]) {
-            maxExpense = values[i];
+        if (values[monthOfMaxExpense] < values[i]) {
+            monthOfMaxExpense = i;
         }
     }
 
-    return maxExpense;
+    return monthOfMaxExpense;
+}
+
+int getMin(int values[], int length) {
+    int monthOfMinExpense = 0;
+
+    for (int i = 1; i < length; i++) {
+        if (values[monthOfMinExpense] > values[i]) {
+            monthOfMinExpense = i;
+        }
+    }
+
+    return monthOfMinExpense;
 }
 
 int getMonthCount(int values[]) {
@@ -19,10 +31,22 @@ int getMonthCount(int values[]) {
     return length;
 }
 
+int getAverage(int values[], int length) {
+    int avg = 0;
+
+    for (int i = 0; i < length; i++) {
+        avg += values[i];
+    }
+
+    return avg / length;
+}
+
 void plot(int values[], int firstMonth) {
     int monthCount = getMonthCount(values);
-    int maxExpense = getMax(values, monthCount);
-    int scale[2] = {maxExpense / 1000, monthCount * 2 + 1};
+    int monthOfMaxExpense = getMax(values, monthCount);
+    int monthOfMinExpense = getMin(values, monthCount);
+    int averageExpense = getAverage(values, monthCount);
+    int scale[2] = {values[monthOfMaxExpense] / 1000, monthCount * 2 + 1};
     char calendar[12][4] = {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
 
     printf("\nGRAPHICAL REPRESENTATION OF EXPENSES IN THE YEAR 2024\n");
@@ -36,6 +60,14 @@ void plot(int values[], int firstMonth) {
         for (int value = 0; value < values[month - firstMonth] / 1000; value++) {
             printf("*");
         }
+
+        if (month == monthOfMaxExpense + firstMonth) {
+            printf(" [PEAK: %d]", values[monthOfMaxExpense]);
+        }
+        if (month == monthOfMinExpense + firstMonth) {
+            printf(" [LEAST: %d]", values[monthOfMinExpense]);
+        }
+
         printf("\n");
     }
 
@@ -50,5 +82,9 @@ void plot(int values[], int firstMonth) {
     for (int multiplier = 1; multiplier <= scale[0] / 10; multiplier++) {
         printf("        %d", multiplier * 10);
     }
-    printf("\n ");
+    printf("\n     ");
+
+    for (; averageExpense > 0; averageExpense /= 1000) {
+        
+    }
 }
