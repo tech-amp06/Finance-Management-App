@@ -1,10 +1,8 @@
+#include "graphingFunc.c"
 #include <stdio.h>
-#include "graphing.c"
 
 int main() {
-    int expenses[] = {20000, 15000, 24000, 70000, 40000, 60000, 20000, -1};
-    
-    plot(expenses, 3);
-    
-    return 0;
+    int values[10] = {20000, 30000, 40000, 70000, 10000, 30000, 60000, 25000, 22000, -1};
+
+    plot(values, 1);
 }

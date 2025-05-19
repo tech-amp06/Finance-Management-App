@@ -83,8 +83,4 @@ void plot(int values[], int firstMonth) {
         printf("        %d", multiplier * 10);
     }
     printf("\n     ");
-
-    for (; averageExpense > 0; averageExpense /= 1000) {
-        
-    }
 }
