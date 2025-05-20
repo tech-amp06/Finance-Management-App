@@ -27,5 +27,5 @@ void generate_invoice(struct node *head, int invoice_no) {
     printf("Grand Total            : Rs. %d\n", grand_total);
     printf("==========================================\n");
     printf("Signed by: ORGANIZATION NAME\n");
-    printf("==========================================\n");
+    printf("==========================================\n\n");
 }

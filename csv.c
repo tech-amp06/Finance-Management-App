@@ -26,6 +26,7 @@ struct node* createNode(char **fields, int invoice_no) {
     }
 
     strncpy(newNode->date_time, fields[0], sizeof(newNode->date_time));
+    newNode->date_time[sizeof(newNode->date_time) - 1] = '\0';
     strncpy(newNode->from_acc, fields[1], sizeof(newNode->from_acc));
     strncpy(newNode->note, fields[2], sizeof(newNode->note));
     newNode->amount = atoi(fields[3]);
