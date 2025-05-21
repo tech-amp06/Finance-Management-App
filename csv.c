@@ -100,3 +100,27 @@ struct node *read_csv() {
 
     return head;
 }
+
+void addTransaction(struct node *head) {
+    char *fields[MAX_FIELDS];
+    char temp[20];
+    strcpy(fields[1], "CUB - online payment");
+
+    printf("Enter date of transaction: ");
+    scanf("%s", fields[0]);
+
+    printf("Enter amount: ");
+    scanf("%d", fields[3]);
+
+    printf("Note:");
+    scanf("%s", fields[2]);
+
+    printf("Expense(1) or Income(0)?\n");
+    scanf("%s", temp);
+    fields[1] = strcmp(temp, "Expense") == 0 ? 1 : 0;
+
+    struct node *newNode = createNode(fields, head);
+
+    newNode->next = head;
+    head = newNode;
+}
