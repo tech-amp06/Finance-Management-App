@@ -4,6 +4,7 @@
 struct node {
     char date_time[20];
     char from_acc[20];
+    char to_acc[20];
     char note[20];
     int amount;
     int debt_credit;

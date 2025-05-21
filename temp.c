@@ -4,11 +4,9 @@
 #include <ctype.h>
 
 #define MAX_LINE 1024
-#define MAX_FIELDS 5
+#define MAX_FIELDS 6
 
 #include "node.h"
-
-int curr_invoice_no;
 
 void trim(char *str) {
     char *end;
@@ -30,12 +28,15 @@ struct node* createNode(char **fields, int invoice_no) {
     strncpy(newNode->date_time, fields[0], sizeof(newNode->date_time));
     newNode->date_time[sizeof(newNode->date_time) - 1] = '\0';
     strncpy(newNode->from_acc, fields[1], sizeof(newNode->from_acc));
-    strncpy(newNode->note, fields[2], sizeof(newNode->note));
-    newNode->amount = atoi(fields[3]);
-    newNode->debt_credit = strcmp(fields[4], "Expense") == 0 ? 1 : 0;
+    newNode->from_acc[sizeof(newNode->from_acc) - 1] = '\0';
+    strncpy(newNode->to_acc, fields[2], sizeof(newNode->to_acc));
+    newNode->to_acc[sizeof(newNode->to_acc) - 1] = '\0';
+    strncpy(newNode->note, fields[3], sizeof(newNode->note));
+    newNode->note[sizeof(newNode->note) - 1] = '\0';
+    newNode->amount = atoi(fields[4]);
+    newNode->debt_credit = strcmp(fields[5], "Expense") == 0 ? 1 : 0;
     newNode->next = NULL;
     newNode->invoice_no = invoice_no;
-    curr_invoice_no = invoice_no;
 
     return newNode;
 }
@@ -53,18 +54,18 @@ int splitCSV(char *line, char *fields[], int max_fields) {
 
 void printList(struct node *head) {
     printf("Transaction History:\n");
-    printf("Time       | From Acc             | Note                           | Amount     | D/C | Invoice no.\n");
-    printf("---------------------------------------------------------------------------------------------------\n");
+    printf("Time       | From Acc             | To Acc               | Note                           | Amount     | D/C | Invoice no.\n");
+    printf("-------------------------------------------------------------------------------------------------------------------------\n");
     while (head) {
-        printf("%-10.10s | %-20.20s | %-30.30s | %10d | %d  | %d\n",
-               head->date_time, head->from_acc, head->note,
+        printf("%-10.10s | %-20.20s | %-20.20s | %-30.30s | %10d | %d  | %d\n",
+               head->date_time, head->from_acc, head->to_acc, head->note,
                head->amount, head->debt_credit, head->invoice_no);
         head = head->next;
     }
 }
 
 struct node *read_csv() {
-    FILE *fp = fopen("expenses_final.csv", "r");
+    FILE *fp = fopen("expenses_final_corrected_full.csv", "r");
     if (!fp) {
         perror("File open failed");
         return NULL;
@@ -100,60 +101,42 @@ struct node *read_csv() {
     }
 
     fclose(fp);
-
     return head;
 }
 
-// struct node *write_csv(struct node *head) {
-//     struct node *iterator = head;
-//     FILE *fp = fopen("expenses_final.csv", "w");
-
-//     while (iterator) {
-        
-
-//         iterator = iterator->next;
-//     }
-// }
-
-struct node *addTransaction(struct node *head) {
+void addTransaction(struct node **head_ref) {
+    static char date[100], from_acc[100], to_acc[100], note[100], amount[20], type[20];
     char *fields[MAX_FIELDS];
-    char temp[20];
-    char temp_date[20], temp_from[50], temp_note[50], temp_amount[10], temp_type[10];
-    
-    for (int i = 0; i < MAX_FIELDS; i++) {
-        fields[i] = malloc(100);
-    }
 
-    printf("Enter date and time of transaction: ");
-    fgets(temp_date, sizeof(temp_date), stdin);
-    temp_date[strcspn(temp_date, "\n")] = '\0';
-    strcpy(fields[0], temp_date);
+    fields[0] = date;
+    fields[1] = from_acc;
+    fields[2] = to_acc;
+    fields[3] = note;
+    fields[4] = amount;
+    fields[5] = type;
 
-    strcpy(fields[1], "CUB - online payment");
+    printf("Enter date (YYYY-MM-DD): ");
+    scanf(" %[^\n]", fields[0]);
 
-    printf("Enter amount: ");
-    fgets(temp_amount, sizeof(temp_amount), stdin);
-    temp_amount[strcspn(temp_amount, "\n")] = '\0';
-    strcpy(fields[3], temp_amount);
+    printf("From account: ");
+    scanf(" %[^\n]", fields[1]);
+
+    printf("To account: ");
+    scanf(" %[^\n]", fields[2]);
 
     printf("Note: ");
-    fgets(temp_note, sizeof(temp_note), stdin);
-    temp_note[strcspn(temp_note, "\n")] = '\0';
-    strcpy(fields[2], temp_note);
+    scanf(" %[^\n]", fields[3]);
 
-    printf("Expense(1) or Income(0)?\n");
-    fgets(temp_type, sizeof(temp_type), stdin);
-    temp_type[strcspn(temp_type, "\n")] = '\0';
-    fields[4] = strcmp(temp_type, "1") == 0 ? "1" : "0";
+    printf("Amount: ");
+    scanf(" %[^\n]", fields[4]);
 
-    struct node *newNode = createNode(fields, curr_invoice_no + 1);
+    printf("Type (Expense or Income): ");
+    scanf(" %[^\n]", fields[5]);
 
-    newNode->next = head;
-    head = newNode;
+    static int invoice_no = 99999;  // Replace with tracking mechanism if needed
+    struct node *newNode = createNode(fields, invoice_no++);
+    newNode->next = *head_ref;
+    *head_ref = newNode;
 
-    for (int i = 0; i < MAX_FIELDS; i++) {
-        free(fields[i]);
-    }
-
-    return head;
+    printf("Transaction added successfully.\n");
 }
