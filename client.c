@@ -6,8 +6,6 @@
 #include "invoice.c"
 #include "node.h"
 #include "balance_sheet.c"
-#include "temp.c"
-
 
 int main() {
     int choice, invoice_type, invoice_no;
