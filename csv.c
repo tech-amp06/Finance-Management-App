@@ -4,11 +4,11 @@
 #include <ctype.h>
 
 #define MAX_LINE 1024
-#define MAX_FIELDS 5
+#define MAX_FIELDS 6
 
 #include "node.h"
 
-int curr_invoice_no;
+int curr_invoice_no = 10000;
 
 void trim(char *str) {
     char *end;
@@ -30,12 +30,15 @@ struct node* createNode(char **fields, int invoice_no) {
     strncpy(newNode->date_time, fields[0], sizeof(newNode->date_time));
     newNode->date_time[sizeof(newNode->date_time) - 1] = '\0';
     strncpy(newNode->from_acc, fields[1], sizeof(newNode->from_acc));
+    newNode->from_acc[sizeof(newNode->from_acc) - 1] = '\0';
+    strncpy(newNode->to_acc, fields[5], sizeof(newNode->to_acc));
+    newNode->to_acc[sizeof(newNode->to_acc) - 1] = '\0';
     strncpy(newNode->note, fields[2], sizeof(newNode->note));
+    newNode->note[sizeof(newNode->note) - 1] = '\0';
     newNode->amount = atoi(fields[3]);
     newNode->debt_credit = strcmp(fields[4], "Expense") == 0 ? 1 : 0;
     newNode->next = NULL;
     newNode->invoice_no = invoice_no;
-    curr_invoice_no = invoice_no;
 
     return newNode;
 }
@@ -53,18 +56,18 @@ int splitCSV(char *line, char *fields[], int max_fields) {
 
 void printList(struct node *head) {
     printf("Transaction History:\n");
-    printf("Time       | From Acc             | Note                           | Amount     | D/C | Invoice no.\n");
-    printf("---------------------------------------------------------------------------------------------------\n");
+    printf("Time       | From Acc             | To Acc               | Note                           | Amount     | D/C | Invoice no.\n");
+    printf("-------------------------------------------------------------------------------------------------------------------------\n");
     while (head) {
-        printf("%-10.10s | %-20.20s | %-30.30s | %10d | %d  | %d\n",
-               head->date_time, head->from_acc, head->note,
+        printf("%-10.10s | %-20.20s | %-20.20s | %-30.30s | %10d | %d   | %d\n",
+               head->date_time, head->from_acc, head->to_acc, head->note,
                head->amount, head->debt_credit, head->invoice_no);
         head = head->next;
     }
 }
 
 struct node *read_csv() {
-    FILE *fp = fopen("expenses_final.csv", "r");
+    FILE *fp = fopen("expenses_final_corrected_full.csv", "r");
     if (!fp) {
         perror("File open failed");
         return NULL;
@@ -97,6 +100,7 @@ struct node *read_csv() {
             tail = newNode;
         }
         invoice_no++;
+        curr_invoice_no = invoice_no;
     }
 
     fclose(fp);
@@ -104,21 +108,21 @@ struct node *read_csv() {
     return head;
 }
 
-// struct node *write_csv(struct node *head) {
-//     struct node *iterator = head;
-//     FILE *fp = fopen("expenses_final.csv", "w");
+struct node *write_csv(struct node *head) {
+    struct node *iterator = head;
+    FILE *fp = fopen("expenses_final.csv", "w");
 
-//     while (iterator) {
+    while (iterator) {
         
 
-//         iterator = iterator->next;
-//     }
-// }
+        iterator = iterator->next;
+    }
+}
 
 struct node *addTransaction(struct node *head) {
     char *fields[MAX_FIELDS];
     char temp[20];
-    char temp_date[20], temp_from[50], temp_note[50], temp_amount[10], temp_type[10];
+    char temp_date[20], temp_from[50], temp_to[50], temp_note[100], temp_amount[10], temp_type[10];
     
     for (int i = 0; i < MAX_FIELDS; i++) {
         fields[i] = malloc(100);
@@ -130,6 +134,11 @@ struct node *addTransaction(struct node *head) {
     strcpy(fields[0], temp_date);
 
     strcpy(fields[1], "CUB - online payment");
+    
+    printf("Enter receiver account: ");
+    fgets(temp_to, sizeof(temp_to), stdin);
+    temp_to[strcspn(temp_to, "\n")] = '\0';
+    strcpy(fields[5], temp_to);
 
     printf("Enter amount: ");
     fgets(temp_amount, sizeof(temp_amount), stdin);
@@ -146,7 +155,7 @@ struct node *addTransaction(struct node *head) {
     temp_type[strcspn(temp_type, "\n")] = '\0';
     fields[4] = strcmp(temp_type, "1") == 0 ? "1" : "0";
 
-    struct node *newNode = createNode(fields, curr_invoice_no + 1);
+    struct node *newNode = createNode(fields, curr_invoice_no++);
 
     newNode->next = head;
     head = newNode;
